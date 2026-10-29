@@ -130,6 +130,12 @@ class AppState(private val context: Context) {
         store.renameEmployer(id, name); employers = store.employers()
     }
 
+    fun setEmployerColor(id: String, color: Int) {
+        store.setEmployerColor(id, color); employers = store.employers()
+    }
+
+    fun employerColorIndex(id: String?): Int? = employers.firstOrNull { it.id == id }?.color
+
     fun deleteEmployer(id: String) {
         store.deleteEmployer(id); employers = store.employers()
         if (filter == id) filter = null

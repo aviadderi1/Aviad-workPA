@@ -1,6 +1,14 @@
 package com.aviad.workpa.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -76,13 +84,23 @@ fun SettingsScreen(state: AppState, onBack: () -> Unit) {
         ) {
             Section("מעסיקים")
             state.employers.forEach { e ->
-                Row(
-                    Modifier.fillMaxWidth().background(Card, RoundedCornerShape(10.dp)).padding(start = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(e.name, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { renaming = e }) { Icon(Icons.Filled.Edit, "שנה שם") }
-                    IconButton(onClick = { deleting = e }) { Icon(Icons.Filled.Delete, "מחק") }
+                Column(Modifier.fillMaxWidth().background(Card, RoundedCornerShape(10.dp)).padding(start = 12.dp, bottom = 10.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(14.dp).background(employerColor(e.color), CircleShape))
+                        Spacer(Modifier.width(8.dp))
+                        Text(e.name, modifier = Modifier.weight(1f))
+                        IconButton(onClick = { renaming = e }) { Icon(Icons.Filled.Edit, "שנה שם") }
+                        IconButton(onClick = { deleting = e }) { Icon(Icons.Filled.Delete, "מחק") }
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        EmployerPalette.forEachIndexed { i, c ->
+                            Box(
+                                Modifier.size(28.dp).clip(CircleShape).background(c)
+                                    .border(if (i == e.color) 3.dp else 0.dp, Color.White, CircleShape)
+                                    .clickable { state.setEmployerColor(e.id, i) }
+                            )
+                        }
+                    }
                 }
             }
             OutlinedButton(onClick = { addEmployer = true }, modifier = Modifier.fillMaxWidth()) {

@@ -1,7 +1,7 @@
 package com.aviad.workpa.data
 
 /** An employer the user works for. */
-data class Employer(val id: String, val name: String)
+data class Employer(val id: String, val name: String, val color: Int = 0)
 
 /** What the app adds on top of a calendar event: who pays, how much, and whether it was paid. */
 data class JobMeta(

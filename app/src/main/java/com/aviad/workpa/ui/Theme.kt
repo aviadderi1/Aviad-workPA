@@ -18,6 +18,23 @@ val Bg = Color(0xFF121212)
 val Card = Color(0xFF1E1E1E)
 val Card2 = Color(0xFF262626)
 val Muted = Color(0xFF9E9E9E)
+val NoEmployerColor = Color(0xFF616161)
+
+/** One color per employer – bright enough on the dark background, easy to tell apart. */
+val EmployerPalette = listOf(
+    Color(0xFF42A5F5), // blue
+    Color(0xFFEF5350), // red
+    Color(0xFFBCAAA4), // sand
+    Color(0xFFAB47BC), // purple
+    Color(0xFF26C6DA), // cyan
+    Color(0xFFFF7043), // orange
+    Color(0xFFEC407A), // pink
+    Color(0xFFD4E157), // lime
+)
+
+fun employerColor(index: Int?): Color =
+    index?.let { EmployerPalette[((it % EmployerPalette.size) + EmployerPalette.size) % EmployerPalette.size] }
+        ?: NoEmployerColor
 
 private val scheme = darkColorScheme(
     primary = Amber,

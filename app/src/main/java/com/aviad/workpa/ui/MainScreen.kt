@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -43,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -151,6 +155,7 @@ fun MainScreen(
             }
             items(visible, key = { it.key }) { job ->
                 JobRow(job, state.employerName(job.meta.employerId),
+                    color = employerColor(state.employerColorIndex(job.meta.employerId)),
                     onClick = { onOpenJob(job) }, onTogglePaid = { state.togglePaid(job) })
             }
         }
@@ -164,23 +169,34 @@ private fun EmployerChips(state: AppState) {
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Chip("כולם", state.filter == null) { state.filter = null }
-        state.employers.forEach { e -> Chip(e.name, state.filter == e.id) { state.filter = e.id } }
+        state.employers.forEach { e ->
+            Chip(e.name, state.filter == e.id, dot = employerColor(e.color)) { state.filter = e.id }
+        }
         if (state.jobs.any { j -> j.meta.employerId == null || state.employers.none { it.id == j.meta.employerId } }) {
-            Chip("ללא מעסיק", state.filter == NO_EMPLOYER) { state.filter = NO_EMPLOYER }
+            Chip("ללא מעסיק", state.filter == NO_EMPLOYER, dot = NoEmployerColor) { state.filter = NO_EMPLOYER }
         }
     }
 }
 
 @Composable
-fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
+fun Chip(label: String, selected: Boolean, dot: Color? = null, onClick: () -> Unit) {
     val shape = RoundedCornerShape(50)
-    Box(
+    val accent = dot ?: Amber
+    Row(
         Modifier
-            .background(if (selected) AmberDark else Color.Transparent, shape)
-            .border(1.dp, if (selected) Amber else Color(0xFF444444), shape)
+            .clip(shape)
+            .background(if (selected) accent.copy(alpha = 0.22f) else Color.Transparent, shape)
+            .border(1.dp, if (selected) accent else Color(0xFF444444), shape)
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 7.dp)
-    ) { Text(label, color = if (selected) Amber else Color(0xFFDDDDDD), fontSize = 13.sp) }
+            .padding(horizontal = 14.dp, vertical = 7.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (dot != null) {
+            Box(Modifier.size(10.dp).background(dot, CircleShape))
+            Spacer(Modifier.width(6.dp))
+        }
+        Text(label, color = if (selected) (if (dot == null) Amber else Color.White) else Color(0xFFDDDDDD), fontSize = 13.sp)
+    }
 }
 
 @Composable
@@ -212,9 +228,14 @@ private fun Stat(label: String, value: String, color: Color, modifier: Modifier)
 }
 
 @Composable
-private fun JobRow(job: Job, employer: String, onClick: () -> Unit, onTogglePaid: () -> Unit) {
+private fun JobRow(job: Job, employer: String, color: Color, onClick: () -> Unit, onTogglePaid: () -> Unit) {
     val d = job.event.localDate()
-    Column(Modifier.clip(RoundedCornerShape(12.dp)).background(Card).clickable(onClick = onClick)) {
+    Row(
+        Modifier.height(IntrinsicSize.Min).clip(RoundedCornerShape(12.dp))
+            .background(color.copy(alpha = 0.10f).compositeOver(Card)).clickable(onClick = onClick)
+    ) {
+    Box(Modifier.width(6.dp).fillMaxHeight().background(color))
+    Column(Modifier.weight(1f)) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(
@@ -223,9 +244,13 @@ private fun JobRow(job: Job, employer: String, onClick: () -> Unit, onTogglePaid
                 )
                 Text(job.event.title, fontSize = 14.sp, fontWeight = FontWeight.Bold, lineHeight = 18.sp,
                     maxLines = 2, overflow = TextOverflow.Ellipsis)
-                val sub = listOf(employer, job.event.location).filter { it.isNotBlank() }
-                Text(sub.joinToString(" · "), fontSize = 12.sp, color = Muted, maxLines = 1,
-                    overflow = TextOverflow.Ellipsis)
+                Row {
+                    Text(employer, fontSize = 12.sp, color = color, fontWeight = FontWeight.Bold, maxLines = 1)
+                    if (job.event.location.isNotBlank()) {
+                        Text(" · ${job.event.location}", fontSize = 12.sp, color = Muted, maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
+                    }
+                }
             }
             Spacer(Modifier.width(8.dp))
             Column(horizontalAlignment = Alignment.End) {
@@ -248,5 +273,6 @@ private fun JobRow(job: Job, employer: String, onClick: () -> Unit, onTogglePaid
             Text(job.meta.notes, fontSize = 12.sp, color = Muted, maxLines = 2,
                 overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
         }
+    }
     }
 }

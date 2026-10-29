@@ -10,6 +10,8 @@ import java.util.UUID
  * employers, per-job meta (employer / amount / paid / notes) and settings.
  * Plain JSON in SharedPreferences – no extra libraries.
  */
+const val PALETTE_SIZE = 8
+
 class Store(context: Context) {
     private val prefs = context.getSharedPreferences("workpa", Context.MODE_PRIVATE)
 
@@ -18,24 +20,30 @@ class Store(context: Context) {
         val arr = JSONArray(prefs.getString("employers", "[]"))
         return (0 until arr.length()).map {
             val o = arr.getJSONObject(it)
-            Employer(o.getString("id"), o.getString("name"))
+            Employer(o.getString("id"), o.getString("name"), o.optInt("color", it))
         }
     }
 
     private fun saveEmployers(list: List<Employer>) {
         val arr = JSONArray()
-        list.forEach { arr.put(JSONObject().put("id", it.id).put("name", it.name)) }
+        list.forEach { arr.put(JSONObject().put("id", it.id).put("name", it.name).put("color", it.color)) }
         prefs.edit().putString("employers", arr.toString()).apply()
     }
 
     fun addEmployer(name: String): Employer {
-        val e = Employer(UUID.randomUUID().toString(), name.trim())
-        saveEmployers(employers() + e)
+        val current = employers()
+        val used = current.map { it.color }.toSet()
+        val color = (0 until PALETTE_SIZE).firstOrNull { it !in used } ?: (current.size % PALETTE_SIZE)
+        val e = Employer(UUID.randomUUID().toString(), name.trim(), color)
+        saveEmployers(current + e)
         return e
     }
 
     fun renameEmployer(id: String, name: String) =
         saveEmployers(employers().map { if (it.id == id) it.copy(name = name.trim()) else it })
+
+    fun setEmployerColor(id: String, color: Int) =
+        saveEmployers(employers().map { if (it.id == id) it.copy(color = color) else it })
 
     fun deleteEmployer(id: String) {
         saveEmployers(employers().filterNot { it.id == id })
