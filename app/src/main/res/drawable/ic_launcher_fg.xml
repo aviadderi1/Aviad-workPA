@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Calendar page with a speaker cone, amber accent -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#FFFFB300"
+        android:pathData="M34,36h40a4,4 0,0 1,4 4v32a4,4 0,0 1,-4 4h-40a4,4 0,0 1,-4 -4v-32a4,4 0,0 1,4 -4z" />
+    <path android:fillColor="#FF1A1A1A"
+        android:pathData="M30,44h48v4h-48z" />
+    <path android:fillColor="#FFFFB300"
+        android:pathData="M40,30h4v10h-4zM64,30h4v10h-4z" />
+    <path android:fillColor="#FF1A1A1A"
+        android:pathData="M54,52a10,10 0,1 0,0.01 0z" />
+    <path android:fillColor="#FFFFB300"
+        android:pathData="M54,57a5,5 0,1 0,0.01 0z" />
+</vector>
