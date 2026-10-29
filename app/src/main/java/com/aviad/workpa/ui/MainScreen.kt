@@ -55,7 +55,8 @@ import com.aviad.workpa.data.hoursText
 import com.aviad.workpa.data.localDate
 import com.aviad.workpa.data.money
 import com.aviad.workpa.data.monthTitle
-import com.aviad.workpa.data.shortDayName
+import com.aviad.workpa.data.dateText
+import com.aviad.workpa.data.dayName
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -95,6 +96,9 @@ fun MainScreen(
                         modifier = Modifier.weight(1f))
                     IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, "הגדרות") }
                 }
+            }
+            if (state.update != null || state.updateProgress != null) {
+                item { UpdateBanner(state) }
             }
             item {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -212,14 +216,14 @@ private fun JobRow(job: Job, employer: String, onClick: () -> Unit, onTogglePaid
     val d = job.event.localDate()
     Column(Modifier.clip(RoundedCornerShape(12.dp)).background(Card).clickable(onClick = onClick)) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.width(44.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("${d.dayOfMonth}", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(shortDayName(d), fontSize = 11.sp, color = Muted)
-            }
-            Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(job.event.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                val sub = listOf(employer, job.event.hoursText(), job.event.location).filter { it.isNotBlank() }
+                Text(
+                    "${dayName(d)}, ${dateText(d)} · ${job.event.hoursText()}",
+                    fontSize = 12.sp, color = Amber, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+                Text(job.event.title, fontSize = 14.sp, fontWeight = FontWeight.Bold, lineHeight = 18.sp,
+                    maxLines = 2, overflow = TextOverflow.Ellipsis)
+                val sub = listOf(employer, job.event.location).filter { it.isNotBlank() }
                 Text(sub.joinToString(" · "), fontSize = 12.sp, color = Muted, maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
             }

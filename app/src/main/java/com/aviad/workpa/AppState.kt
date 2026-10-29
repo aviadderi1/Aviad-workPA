@@ -15,6 +15,8 @@ import com.aviad.workpa.data.Employer
 import com.aviad.workpa.data.Job
 import com.aviad.workpa.data.JobMeta
 import com.aviad.workpa.data.Store
+import com.aviad.workpa.update.UpdateInfo
+import com.aviad.workpa.update.Updater
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.YearMonth
@@ -37,6 +39,39 @@ class AppState(private val context: Context) {
     var loading by mutableStateOf(false)
     var error by mutableStateOf<String?>(null)
     var resumeTick by mutableIntStateOf(0)
+
+    // ---------- in-app update ----------
+    var update by mutableStateOf<UpdateInfo?>(null)
+    var updateProgress by mutableStateOf<Float?>(null)   // non-null while downloading
+    var updateMsg by mutableStateOf<String?>(null)
+
+    suspend fun checkUpdate(manual: Boolean = false) {
+        try {
+            update = Updater.check(context)
+            if (manual && update == null) updateMsg = "יש לך את הגרסה האחרונה"
+        } catch (e: Exception) {
+            if (manual) updateMsg = "אין חיבור לבדיקת עדכונים"
+        }
+    }
+
+    suspend fun installUpdate() {
+        val info = update ?: return
+        if (Updater.needsInstallPermission(context)) {
+            updateMsg = "אשר \"התקנת אפליקציות\" ל-Aviad workPA, חזור ולחץ שוב על עדכן"
+            Updater.openInstallPermissionSettings(context)
+            return
+        }
+        try {
+            updateMsg = null
+            updateProgress = 0f
+            val apk = Updater.download(context, info) { updateProgress = it }
+            updateProgress = null
+            Updater.install(context, apk)
+        } catch (e: Exception) {
+            updateProgress = null
+            updateMsg = "העדכון נכשל: ${e.message}"
+        }
+    }
 
     fun checkPermission(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED &&

@@ -37,6 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aviad.workpa.AppState
 import com.aviad.workpa.data.Employer
+import com.aviad.workpa.update.Updater
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(state: AppState, onBack: () -> Unit) {
@@ -113,6 +117,21 @@ fun SettingsScreen(state: AppState, onBack: () -> Unit) {
                 }
             }
             OutlinedButton(onClick = { persist(); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("שמור וחזור") }
+
+            Section("עדכונים")
+            val ctx = LocalContext.current
+            val scope = rememberCoroutineScope()
+            Text("גרסה מותקנת: ${Updater.installedVersion(ctx)}", fontSize = 13.sp, color = Muted)
+            if (state.update != null) {
+                UpdateBanner(state)
+            } else {
+                OutlinedButton(
+                    onClick = { state.updateMsg = null; scope.launch { state.checkUpdate(manual = true) } },
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("בדוק עדכונים") }
+                state.updateMsg?.let { Text(it, fontSize = 12.sp, color = Muted) }
+            }
+
             Text("Aviad workPA · AD SOUND & SERVICE", fontSize = 11.sp, color = Muted,
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp))
         }

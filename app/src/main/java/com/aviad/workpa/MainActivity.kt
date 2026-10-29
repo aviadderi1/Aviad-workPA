@@ -79,6 +79,7 @@ private fun App(state: AppState) {
     }
 
     LaunchedEffect(state.month, state.resumeTick) { state.reload() }
+    LaunchedEffect(state.resumeTick) { if (state.updateProgress == null) state.checkUpdate() }
 
     if (!state.hasPermission) {
         PermissionScreen {
