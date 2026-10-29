@@ -33,7 +33,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,13 +81,13 @@ fun MainScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
-            ExtendedFloatingActionButton(
+            FloatingActionButton(
                 onClick = onAdd,
+                shape = CircleShape,
                 containerColor = Amber,
                 contentColor = Color(0xFF1A1A1A),
-                icon = { Icon(Icons.Filled.Add, null) },
-                text = { Text("הוסף עבודה", fontWeight = FontWeight.Bold) },
-            )
+                modifier = Modifier.size(64.dp),
+            ) { Icon(Icons.Filled.Add, "הוסף עבודה", Modifier.size(32.dp)) }
         },
     ) { pad ->
         LazyColumn(
