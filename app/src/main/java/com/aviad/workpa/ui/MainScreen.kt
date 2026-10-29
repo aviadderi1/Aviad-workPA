@@ -130,11 +130,6 @@ fun MainScreen(
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = onSync, modifier = Modifier.weight(1f)) {
-                        if (state.loading) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
-                        else Icon(Icons.Filled.Refresh, null, Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp)); Text("סנכרון יומן")
-                    }
                     Button(
                         onClick = onExport,
                         modifier = Modifier.weight(1f),

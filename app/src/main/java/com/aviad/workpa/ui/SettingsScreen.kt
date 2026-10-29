@@ -136,9 +136,22 @@ fun SettingsScreen(state: AppState, onBack: () -> Unit) {
             }
             OutlinedButton(onClick = { persist(); onBack() }, modifier = Modifier.fillMaxWidth()) { Text("שמור וחזור") }
 
-            Section("עדכונים")
             val ctx = LocalContext.current
             val scope = rememberCoroutineScope()
+
+            Section("סנכרון יומן")
+            val syncText = state.lastSync?.let {
+                "סונכרן לאחרונה ב-" + java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(java.util.Date(it))
+            } ?: "עוד לא סונכרן"
+            Text("${syncText}. הסנכרון קורה גם אוטומטית בכל פתיחה של האפליקציה.", fontSize = 13.sp, color = Muted)
+            OutlinedButton(
+                onClick = { persist(); scope.launch { state.reload() } },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.loading,
+            ) { Text(if (state.loading) "מסנכרן…" else "סנכרן עכשיו") }
+            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error, fontSize = 13.sp) }
+
+            Section("עדכונים")
             Text("גרסה מותקנת: ${Updater.installedVersion(ctx)}", fontSize = 13.sp, color = Muted)
             if (state.update != null) {
                 UpdateBanner(state)
