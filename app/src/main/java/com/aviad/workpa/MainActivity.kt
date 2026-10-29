@@ -35,6 +35,7 @@ import com.aviad.workpa.ui.Amber
 import com.aviad.workpa.ui.ExportDialog
 import com.aviad.workpa.ui.JobEditor
 import com.aviad.workpa.ui.MainScreen
+import com.aviad.workpa.ui.PayslipsScreen
 import com.aviad.workpa.ui.Muted
 import com.aviad.workpa.ui.SettingsScreen
 import com.aviad.workpa.ui.WorkPATheme
@@ -73,6 +74,7 @@ private fun App(state: AppState) {
     var editing by remember { mutableStateOf<Editing?>(null) }
     var exporting by remember { mutableStateOf(false) }
     var settings by remember { mutableStateOf(false) }
+    var payslips by remember { mutableStateOf(false) }
 
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         scope.launch { state.reload() }
@@ -94,6 +96,11 @@ private fun App(state: AppState) {
         return
     }
 
+    if (payslips) {
+        PayslipsScreen(state, onBack = { payslips = false })
+        return
+    }
+
     MainScreen(
         state = state,
         onPrevMonth = { state.month = state.month.minusMonths(1) },
@@ -103,6 +110,7 @@ private fun App(state: AppState) {
         onOpenJob = { editing = Editing.Existing(it) },
         onExport = { exporting = true },
         onSettings = { settings = true },
+        onPayslips = { payslips = true },
     )
 
     editing?.let { e ->

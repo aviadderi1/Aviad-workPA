@@ -75,6 +75,7 @@ fun MainScreen(
     onOpenJob: (Job) -> Unit,
     onExport: () -> Unit,
     onSettings: () -> Unit,
+    onPayslips: () -> Unit,
 ) {
     val visible = state.visibleJobs()
     Scaffold(
@@ -98,6 +99,7 @@ fun MainScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Aviad workPA", color = Amber, fontWeight = FontWeight.Bold, fontSize = 18.sp,
                         modifier = Modifier.weight(1f))
+                    OutlinedButton(onClick = onPayslips) { Text("תלושים") }
                     IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, "הגדרות") }
                 }
             }
