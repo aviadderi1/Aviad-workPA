@@ -7,7 +7,6 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import com.aviad.workpa.data.Job
 import com.aviad.workpa.data.dateText
-import com.aviad.workpa.data.hoursText
 import com.aviad.workpa.data.localDate
 import com.aviad.workpa.data.money
 import com.aviad.workpa.data.monthTitle
@@ -44,9 +43,9 @@ object ReportPdf {
             add(Col("#", 24f))
             add(Col("תאריך", 66f))
             add(Col("יום", 46f))
-            add(Col("אירוע", if (showAmounts) 160f else 210f))
-            add(Col("שעות", 74f))
-            add(Col("מיקום", if (showAmounts) 82f else 103f))
+            add(Col("אירוע", if (showAmounts) 150f else 180f))
+            add(Col("מיקום", if (showAmounts) 80f else 100f))
+            add(Col("הערות", if (showAmounts) 86f else 107f))
             if (showAmounts) add(Col("סכום", 71f))
         }
 
@@ -110,8 +109,8 @@ object ReportPdf {
                 add(dateText(d))
                 add(shortDayName(d))
                 add(job.event.title)
-                add(job.event.hoursText())
                 add(job.event.location)
+                add(job.meta.notes.replace('\n', ' ').trim())
                 if (showAmounts) add(job.meta.amount?.let { money(it) } ?: "—")
             }
             var x = right
